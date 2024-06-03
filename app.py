@@ -30,10 +30,19 @@ def analyze():
         logging.info(f"Response from Hugging Face: {response.json()}")
         
         response.raise_for_status()  # Check if the request was successful
+        
+        # If the response is successful, return the JSON data and the status code
         return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:
+        # Log any request exceptions
         logging.error(f"RequestException: {e}")
+        
+        # Return an error response with status code 500
         return jsonify({'error': str(e)}), 500
+    except KeyError as e:
+        # Handle KeyError (e.g., if 'text' key is missing in the request JSON)
+        logging.error(f"KeyError: {e}")
+        return jsonify({'error': f"KeyError: {e}"}), 400
 
 @app.route('/hello')
 def hello():
