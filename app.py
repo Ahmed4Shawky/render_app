@@ -7,8 +7,8 @@ app = Flask(__name__)
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Replace this with your Replit app URL
-REPLIT_APP_URL = "https://flaskapp.ahmedshawky12.repl.co"
+# URL of your Hugging Face space
+HUGGING_FACE_URL = "https://huggingface.co/spaces/A7med4/flask_app2"
 
 @app.route('/')
 def home():
@@ -20,11 +20,14 @@ def analyze():
         # Log the incoming request
         logging.info(f"Incoming request: {request.json}")
         
-        # Forward the request to the Replit app
-        response = requests.post(f"{REPLIT_APP_URL}/analyze", json=request.json)
+        # Extract text from the request
+        text = request.json['text']
         
-        # Log the response from the Replit app
-        logging.info(f"Response from Replit: {response.json()}")
+        # Send the text to the Hugging Face model for analysis
+        response = requests.post(f"{HUGGING_FACE_URL}/analyze", json={"text": text})
+        
+        # Log the response from the Hugging Face model
+        logging.info(f"Response from Hugging Face: {response.json()}")
         
         response.raise_for_status()  # Check if the request was successful
         return jsonify(response.json()), response.status_code
