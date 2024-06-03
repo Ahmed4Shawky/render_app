@@ -27,22 +27,27 @@ def analyze():
         response = requests.post(f"{HUGGING_FACE_URL}/analyze", json={"text": text})
         
         # Log the response from the Hugging Face model
-        logging.info(f"Response from Hugging Face: {response.json()}")
+        logging.info(f"Response from Hugging Face: {response.text}")
         
         response.raise_for_status()  # Check if the request was successful
         
-        # If the response is successful, return the JSON data and the status code
-        return jsonify(response.json()), response.status_code
+        # Check if the response content is empty
+        if not response.text:
+            raise ValueError("Empty response from Hugging Face model")
+        
+        # Parse the JSON response
+        response_data = response.json()
+        
+        return jsonify(response_data), response.status_code
     except requests.exceptions.RequestException as e:
         # Log any request exceptions
         logging.error(f"RequestException: {e}")
-        
-        # Return an error response with status code 500
         return jsonify({'error': str(e)}), 500
-    except KeyError as e:
-        # Handle KeyError (e.g., if 'text' key is missing in the request JSON)
-        logging.error(f"KeyError: {e}")
-        return jsonify({'error': f"KeyError: {e}"}), 400
+    except (KeyError, ValueError) as e:
+        # Handle KeyError or ValueError
+        logging.error(f"Error processing response: {e}")
+        return jsonify({'error': f"Error processing response: {e}"}), 500
+
 
 @app.route('/hello')
 def hello():
