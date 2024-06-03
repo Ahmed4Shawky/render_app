@@ -10,6 +10,10 @@ logging.basicConfig(level=logging.INFO)
 # Replace this with your Replit app URL
 REPLIT_APP_URL = "https://flaskapp.ahmedshawky12.repl.co"
 
+@app.route('/')
+def home():
+    return 'Welcome to the Flask App!'
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     try:
